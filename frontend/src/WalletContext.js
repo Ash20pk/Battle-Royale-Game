@@ -34,7 +34,6 @@ export function WalletProvider({ children }) {
         setAccount(account);
         setSigner(signer);
 
-        const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your contract address
         const contract = new ethers.Contract(contractAddress, TradingCardGame.abi, signer);
         setContract(contract);
 
