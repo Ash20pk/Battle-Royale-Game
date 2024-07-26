@@ -10,6 +10,8 @@ export function WalletProvider({ children }) {
   const [signer, setSigner] = useState(null);
   const [contract, setContract] = useState(null);
 
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+
   useEffect(() => {
     const initProvider = async () => {
       if (window.ethereum) {
@@ -31,7 +33,7 @@ export function WalletProvider({ children }) {
         setSigner(web3Signer);
         
         const contractInstance = new ethers.Contract(
-          TradingCardGame.address,
+          contractAddress,
           TradingCardGame.abi,
           web3Signer
         );
