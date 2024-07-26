@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
-import TradingCardGame from './contracts/TradingCardGame.json';
+import TradingCardGame from '../contracts/TradingCardGame.json';
 
 const WalletContext = createContext(null);
 
@@ -15,8 +15,8 @@ export function WalletProvider({ children }) {
   useEffect(() => {
     const initProvider = async () => {
       if (window.ethereum) {
-        const web3Provider = new ethers.BrowserProvider(window.ethereum);
-        setProvider(web3Provider);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        setProvider(provider);
       }
     };
 
@@ -27,19 +27,18 @@ export function WalletProvider({ children }) {
     if (provider) {
       try {
         await window.ethereum.request({ method: "eth_requestAccounts" });
-        const web3Signer = await provider.getSigner();
-        const accounts = await web3Signer.getAddress();
-        setAccount(accounts);
-        setSigner(web3Signer);
-        
-        const contractInstance = new ethers.Contract(
-          contractAddress,
-          TradingCardGame.abi,
-          web3Signer
-        );
-        setContract(contractInstance);
-        
-        return { success: true, account: accounts };
+        const signer = provider.getSigner();
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        const account = accounts[0];
+        console.log(account);
+        setAccount(account);
+        setSigner(signer);
+
+        const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your contract address
+        const contract = new ethers.Contract(contractAddress, TradingCardGame.abi, signer);
+        setContract(contract);
+
+        return { success: true, account };
       } catch (error) {
         return { success: false, error: error.message };
       }
@@ -53,11 +52,13 @@ export function WalletProvider({ children }) {
     setContract(null);
   };
 
+  console.log("Wallet Connected", account);
+
   const value = {
     account,
     provider,
     signer,
-    contract,
+    contract, // Add contract to the context value
     connectWallet,
     disconnectWallet,
   };
